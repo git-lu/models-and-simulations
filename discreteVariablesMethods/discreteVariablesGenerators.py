@@ -4,12 +4,10 @@ from math import exp
 
 class RejectionMethod():
     ''' Implements the rejection method for generating a random variable with probability
-    distribution X. The distribution X can be passed as a function or dictionarie,
-    but the Y distribution must be passed as a function'''
+    distribution X. '''
     def __init__(
         self, X_generator=None, Y_generator=None,
-        X_function=None, Y_function=None,
-        X_dist=None,Y_dist=None, c=None):
+        X_function=None, Y_function=None,c=None,n_values=None):
 
         self.x_gen = X_generator
         self.y_gen = Y_generator
@@ -17,14 +15,11 @@ class RejectionMethod():
         self.x_func = X_function
         self.y_func = Y_function
 
-        # In case the ditribution is passed as a dictionary
-        self.x_dist = X_dist
-
-
+        self.n = n_values
         self.c = c
 
         if c is None:
-            self.c = self.calculate_c()
+            self.c = self.calculate_c(self.n)
 
     def generateFromFun(self, iterations):
         values = defaultdict(int)
@@ -40,54 +35,33 @@ class RejectionMethod():
         return values
 
     def generate(self,iterations):
-        if self.x_dist:
-            for _ in range(iterations):
-                self.generateIntFromDict()
-        elif self.x_func:
+        if self.x_func:
             for _ in range(iterations):
                 self.generateIntFromFun()
 
 
     def generateInt(self):
         value = 0
-        if self.x_dist:
-            value = self.generateIntFromDict()
-        elif self.x_func:
+        if self.x_func:
             value = self.generateIntFromFun()
         return value
             
-    def generateIntFromDict(self):
-        value = 0
-        c = self.c
-        y = self.y_gen()
-        u = random()
-        x_dist = self.x_dist
-        y_func = self.y_func
-        while u < x_dist[y] / (c * y_func(y)):
-            u = random()
-            value = y
-        return value
-
-
     def generateIntFromFun(self):
         value = 0
         c = self.c
         y = self.y_gen()
         u = random()
-        while u < self.x_dist(y) / (c * self.y_func(y)):
+        while u < self.x_func(y) / (c * self.y_func(y)):
             u = random()
             value = y
         return value
 
-    def calculate_c(self):
-        ''' Only appliable if x is given as a dict of values'''
+    def calculate_c(self,n):
         c = 1
-        if self.x_dist is None:
-            raise ValueError("X must be given as a dict of values to use this functionality")
-        for i in range(len(self.x_dist)):
-            if (self.x_dist[i]/self.y_func(i)) >= c:
-                c = self.x_dist[i]/self.y_func(i)
-        return c
+        for i in range(n):
+            if (self.x_func(i)/self.y_func(i)) >= c:
+                c = self.x_func(i)/self.y_func(i)
+        return c + 0.01
 
 
 
