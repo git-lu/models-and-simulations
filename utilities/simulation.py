@@ -51,6 +51,7 @@ class Simulation():
             for i in range(nplots):
             # We can set the number of bins with the `bins` kwarg
                 axs[i].hist(results[i], bins=n_bins,normed=1)
+        return self
 
 
 
