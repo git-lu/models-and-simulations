@@ -62,9 +62,10 @@ class RejectionMethod():
         c = self.c
         y = self.y_gen()
         u = random()
-        while u < self.x_func(y) / (c * self.y_func(y)):
+        while u > self.x_func(y) / (c * self.y_func(y)):
             u = random()
-            value = y
+            y = self.y_gen()
+        value = y
         return value
 
     def __calculate_c__(self,n):
@@ -72,7 +73,7 @@ class RejectionMethod():
         for i in range(n):
             if (self.x_func(i)/self.y_func(i)) >= c:
                 c = self.x_func(i)/self.y_func(i)
-        return c + 0.01
+        return c + 0.1
 
 
 

@@ -16,3 +16,5 @@ def meanEstimator(f,k,nSim):
 
     
     
+
+    
