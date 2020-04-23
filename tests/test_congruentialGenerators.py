@@ -21,3 +21,20 @@ def test_mixedCongruentialGenerator():
         results.append(gen.generateNSecuence(n).sequence)
     assert expectedResults == results
 
+def test_MaxSequenceCongruential():
+
+    args = [(5,71),(7,71)]
+    expectedResults = [False,True]    
+    results = []
+
+    for arg in args:
+        results.append(CongruentialGenerator(a=arg[0],moduli=arg[1],seed=1).maxSequence)
+    assert results == expectedResults
+
+def test_MaxSequenceMixed():
+    args = [(125,3,2**9),(123,3,2**9)]
+    expectedResults = [True,False]
+    results = []
+    for arg in args:
+        results.append(MixedCongruentialGenerator(a=arg[0],moduli=arg[2],c=arg[1],seed=1).maxSequence)
+    assert results == expectedResults
