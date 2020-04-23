@@ -13,6 +13,7 @@ class Simulation():
         self.results = []
         self.estimatedMean = 0
         self.std = 0
+        return self
         
     def simulate(self,nSim):
         '''
@@ -26,6 +27,7 @@ class Simulation():
         self.results.append(simulationResults)
         self.estimatedMean = np.mean(simulationResults)
         self.std = np.var(simulationResults)
+        self.meanExecTime = 0
 
         return self
 
@@ -36,7 +38,7 @@ class Simulation():
         '''            
         return runTimeCalc(self.simulation,nSim)
 
-    def plot(self,n_bins = 10):
+    def plotAllResults(self,n_bins = 10):
         '''
         Makes a plot with all the simulation results stored
         '''
@@ -53,6 +55,40 @@ class Simulation():
                 axs[i].hist(results[i], bins=n_bins,normed=1)
         return self
 
+    def plot(self,n_bins = 10):
+        '''
+        Plot lastest simulation
+        '''
+        # pylint: disable=unused-variable
+        results = self.results
+        
+        fig, axs = plt.subplots(1, 1, sharey=True, tight_layout=True)
+        axs.hist(results[-1], bins=n_bins,normed=1)
+        return self
+
+    def calculateMeanExecTime(self,nRuns,plot=True):
+        '''
+        Calculates mean execution time 
+        in nIters executions
+        '''
+        execTimes = runTimeCalc(self.simulation,nRuns)
+        self.meanExecTime = np.mean(execTimes)
+        print("The average execution time is {}".format(self.meanExecTime))
+        if plot:
+            self.plotEfficency(execTimes)
+        return self
+
+    def plotEfficency(self,execTimes):
+        # pylint: disable=no-member,unused-variable
+        fig,ax = plt.subplots(figsize = (15,3))
+        ax.plot(execTimes)
+        ax.set_xticklabels([str(i/5.) for i in range(6)])
+        ax.set_xticks([i for i in range(0,101,20)])
+        ax.set_xlabel('u')
+        ax.set_ylabel('Execution time')
+        ax.legend(loc = 'best')
+        plt.suptitle('Runtime execution times')
+        return self
 
 
 

@@ -29,12 +29,13 @@ class RejectionMethod():
 
         self.x_func = X_function
         self.y_func = Y_function
+        self.y_values = self._precalculate_y_values(20)
 
         self.n = n_values
         self.c = c
 
         if c is None and self.n:
-            self.c = self.__calculate_c__(self.n)
+            self.c = self._calculate_c(self.n)
 
     def generate(self, iterations):
         '''
@@ -56,7 +57,7 @@ class RejectionMethod():
             
     def generateInt(self):
         '''
-        Generates a random int
+        Generates a random int. 
         '''
         value = 0
         c = self.c
@@ -65,17 +66,22 @@ class RejectionMethod():
         while u > self.x_func(y) / (c * self.y_func(y)):
             u = random()
             y = self.y_gen()
+
         value = y
         return value
 
-    def __calculate_c__(self,n):
+    def _calculate_c(self,n):
         c = 1
         for i in range(n):
             if (self.x_func(i)/self.y_func(i)) >= c:
                 c = self.x_func(i)/self.y_func(i)
         return c + 0.1
 
-
+    def _precalculate_y_values(self,nValues):
+        values = defaultdict(int)
+        for i in range(nValues):
+            values[i] = self.y_func(i)
+        return values
 
 
 class InverseTransform():
