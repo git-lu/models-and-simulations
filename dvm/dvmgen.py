@@ -245,7 +245,7 @@ class RiskRateMethod():
     def __init__(self,func):
         self.func = func
 
-    def __calculateRiskRate__(self,n):
+    def __calculateRiskRate(self,n):
         ''' 
         Given a mass probability function f, the risk method for a value n
         is defined as follows:
@@ -266,5 +266,5 @@ class RiskRateMethod():
         riskRate = f(1)
         while u > riskRate:
             generatedValue += 1
-            riskRate = self.__calculateRiskRate__(generatedValue)
+            riskRate = self.__calculateRiskRate(generatedValue)
         return generatedValue

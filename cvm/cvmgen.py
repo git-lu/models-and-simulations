@@ -161,8 +161,6 @@ class InverseTransform(Generator):
         return fun(u)    
 
 
-
-
 class Exponential(InverseTransform):
     def __init__(self,lamda,x_lim=(0,8)):
         self.lamda = lamda
@@ -204,3 +202,19 @@ class Weibull(InverseTransform):
         super().__init__(inverse_cdf,cdf=cdf,limits=lims,pdf=pdf,conds=conds,x_lim=x_lim)
 
 
+class Erlang(Generator):
+    def __init__(self,k,mu,x_lim=(0,8),y_lim=(0,1)):
+        self.k = k
+        self.mu = mu
+        x = np.linspace(x_lim[0],x_lim[1])
+        conds = [x <= 0, x > 0]
+        pdf = [0,lambda x: (x**(k-1) * np.exp(-x/mu))/(np.math.factorial(k-1)*(mu**k))]
+        super().__init__(pdf,conds=conds,x_lim=x_lim,y_lim=y_lim)
+
+    def gen(self):
+        u = 1
+        k = self.k
+        lamda = self.mu
+        for _ in range(k):
+            u *= 1 - random()
+        return -np.log(u)*lamda
