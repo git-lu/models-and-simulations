@@ -21,5 +21,7 @@ latex installed in your computer:
 ```bash
 sudo apt-get install texlive-full
 ```
-- or https://www.latex-project.org/get/
+- or https://www.latex-project.org/get/  
+  
 
+For better visualization of the contents in the notebooks, install [Table of Contents for Jupyter Lab](https://github.com/jupyterlab/jupyterlab-toc "TOC Jupyter lab") or [Table of Contents for Jupyter Notebook](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/toc2/README.html "TOC Jupyter Notebook")

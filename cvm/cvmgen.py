@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import itertools
+import functools
 
 class Generator():
     '''
@@ -218,3 +219,82 @@ class Erlang(Generator):
         for _ in range(k):
             u *= 1 - random()
         return -np.log(u)*lamda
+
+class CompositionMethod(Generator):
+    '''
+    This method generates a random variable
+    that its distribution can be expressed as a
+    weighted sum of other distributions:
+    F(x) = sum from 1 to n of pi*Fi(x)
+    where sum(pi) = 1, 1 <= i <= n
+    AND we know how to generate n Fi random variables
+    IT IS asumed that the generators are from class generator
+    AND the weights are sorted and corresponding to each generator.
+    OK?
+    '''
+    def __init__(self,generators,weights):
+        if sorted(weights) != weights:
+            raise ValueError("Sort the weights and the generators")
+        if not all(issubclass((type(gen)).__bases__[0],Generator) for gen in generators):
+            raise ValueError("Please please give a list of instances of Generator")
+        if len(weights) != len(generators):
+            raise ValueError("weights and generators must be the same lenght")
+        if sum(weights) != 1:
+            raise ValueError("The weights sum is not 1")
+
+        n = len(weights)
+        self.generators = generators
+        self.weights = weights
+        pdf = self.__pdfFromGens()
+        super().__init__(pdf,piecewise=False)
+
+
+    def __pdfFromGens(self):
+        '''
+        We generate the pdf from the
+        generators and the weights.
+        What we want is:
+        pdf = sum(gen.pdf*weigths)
+        '''
+        def pdfmult(pdf,a):
+            def multWrapper(x):
+                newPdf = pdf(x) * a
+                return newPdf
+            return multWrapper
+
+        def pdfsum(pdfs):
+            def sumWrap(x):
+                fsum = 0
+                for f in pdfs:
+                    fsum += f(x)
+                return fsum
+            return sumWrap
+        gens = self.generators
+        weights = self.weights
+        # For now, we will pick only the second one asuming
+        # The first one is zero. Can and SHOULD be refined. 
+        # As it is is disgusting but well
+
+        # Get the principal probability function
+        pdfs = [gen.pdf[1] for gen in gens]
+        # Multiply those by its corresponding weight
+        pdfsMult = [pdfmult(pdfs[i],weights[i]) for i in range(len(pdfs))]
+        # Sum all of them
+        pdf = pdfsum(pdfsMult)
+        # Return in a list because pdfs are lists YOU KNOW very clever of me
+        return [pdf]
+
+    def gen(self):
+        u = random()
+        gens = self.generators
+        weights = self.weights
+        i = 0
+        weight = weights[i]
+        gen = gens[i].gen
+        while u > weight:
+            i += 1
+            weight += weights[i]
+            gen = gens[i].gen
+        return gen()
+
+        
