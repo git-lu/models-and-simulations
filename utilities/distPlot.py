@@ -8,7 +8,9 @@ def plot(funcs,
          cumfuncs=[],
          conds=[],
          dist = True,
-         ax = None
+         ax = None,
+         ls = '--',
+         npoints = 50
         ):
     '''
     Plot a distribution function and
@@ -18,7 +20,7 @@ def plot(funcs,
         raise ValueError("Give all the goddamned functions.")
     # pylint: disable=no-member,unused-variable
     # Make equally separated numbers and plot
-    x = np.linspace(x_lim[0],x_lim[1])
+    x = np.linspace(x_lim[0],x_lim[1],npoints)
     # Setting the figure
     if ax is None:
         fig,ax = plt.subplots(figsize=(12,6))
@@ -31,7 +33,7 @@ def plot(funcs,
     i = 0
     for f in funcs + cumfuncs:
         if type(f) is not int:
-            ax.plot(x,f(x),ls='--',alpha=0.8,label = labels[i])
+            ax.plot(x,f(x),ls=ls,alpha=0.8,label = labels[i])
             i +=1
     if dist:
         # distribution function
@@ -51,12 +53,12 @@ def plot(funcs,
     ax.set_xlim(x_lim[0],x_lim[1])
     ax.set_ylim(y_lim[0],y_lim[1])
     # Plot horizontal line at 1
-    ax.axhline(y=1, color='k', linestyle='--')
-
+    ax.axhline(y=1, color='k',alpha=0.7,linestyle='--')
+    ax.axvline(x=0,color='k',alpha=0.7)
     # Acommodate the x and y axis to be set on zero
-    ax.spines['left'].set_position('zero')
+    #ax.spines['left'].set_position('zero')
     ax.spines['bottom'].set_position('zero')
-    ax.legend(loc='upper left')
+    ax.legend(loc='best')
 
     # show the plot
     plt.show()

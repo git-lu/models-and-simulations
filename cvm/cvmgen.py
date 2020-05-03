@@ -105,6 +105,23 @@ class InverseTransform():
         plt.show()        
 
 
+
+class Exponential(InverseTransform):
+    def __init__(self,lamda,x_lim=(0,8)):
+        self.lamda = lamda
+        pdf = [0,lambda x: lamda*np.exp(-lamda*x)]
+        # We will use our own generation method so...
+        inverse_cdf = []
+        x = np.linspace(x_lim[0],x_lim[1])
+        conds = [x<0,x>=0]
+        super().__init__(inverse_cdf,pdf=pdf,conds=conds,x_lim=x_lim,)
+
+    def gen(self):
+        lamda = self.lamda
+        u = random()
+        return -np.log(u)/lamda
+
+
 class Pareto(InverseTransform):
     def __init__(self,a,x_lim=(0,8)):
         self.a = a
@@ -128,3 +145,5 @@ class Weibull(InverseTransform):
         x = np.linspace(x_lim[0],x_lim[1])
         conds = [x<= 0, x>=0]
         super().__init__(inverse_cdf,cdf=cdf,limits=lims,pdf=pdf,conds=conds,x_lim=x_lim)
+
+
