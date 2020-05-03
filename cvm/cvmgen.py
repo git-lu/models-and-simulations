@@ -2,7 +2,117 @@ from random import random
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
-class InverseTransform():
+import itertools
+
+class Generator():
+    '''
+    Generator class.
+    Generates a random variable with
+    probability distribution pdf
+    '''
+    def __init__(
+        self,
+        pdf = [],
+        cdf = [],
+        conds = [],
+        piecewise = True,
+        x_lim = (0,8),
+        y_lim = (0,1),
+        linspace = []
+        ):
+        # The density probability function, used to plot
+        self.pdf = pdf
+        # The cummulative distribution function
+        self.cdf = cdf
+        # Are the functions defined piecewise? Almost all of them are.
+        self.piecewise = piecewise
+        # These are for the conditions of the piecewise
+        self.x_lim = x_lim
+        self.y_lim = y_lim
+        self.conds = conds
+        self.values = []
+        self.mean = 0
+        # Linear space in which we generate the variable and plot
+        self.linspace = linspace
+
+    def plot(
+        self,
+        nValues,
+        figsize=(12,6),
+        bins = 20,
+        plotMean = True):
+        '''
+        To plot, the probability density function must 
+        be defined. Also a list of 
+        conditions should be given
+        '''
+        # pylint: disable=no-member,unused-variable
+        x_lim = self.x_lim
+        y_lim = self.y_lim
+        ffunc = self.pdf
+
+        if self.linspace == []:
+            x = np.linspace(x_lim[0],x_lim[1])
+        else:
+            x = self.linspace
+        # Create new Figure and an Axes which fills it.
+        fig , ax = plt.subplots(figsize=figsize)
+
+        # Plot the distribution
+        if self.piecewise:
+            conds = self.conds
+            f = np.piecewise(x, conds, ffunc)
+            ax.plot(x,f,'k',linewidth=3,label='f(x)')
+        else:
+            # There is only one function in the list
+            f = ffunc[0]
+            ax.plot(x,f(x),'k',linewidth=3,label='f(x)')
+        
+        # Generate n_values to plot
+        values = [self.gen() for _ in range(nValues)]
+        
+        self.values = values
+        self.mean = np.mean(values)
+
+        # Here we plot the histogram and color the bars
+        # per height
+        N,bins,patches = ax.hist(values,bins=bins,density=True,color='k')
+        fracs = N / N.max()
+
+        norm = colors.Normalize(fracs.min(), fracs.max())
+        norm = colors.Normalize(fracs.min(), fracs.max())
+
+        for thisfrac, thispatch in zip(fracs, patches):
+            color = plt.cm.Spectral_r(norm(thisfrac))
+            thispatch.set_facecolor(color)
+
+        # Set x_axis limits 
+        ax.set_xlim(x_lim[0],x_lim[1])
+        # Set y_axis limits
+        ax.set_xlim(x_lim[0],x_lim[1])
+        # Set x_ticks 
+        ax.set_xticks(range(x_lim[0],x_lim[1]))
+        # We draw a cartesian ax
+        ax.axvline(x=0,color='k')
+        ax.axhline(y=0,color='k')
+        # Draw a line in y=1 for reference
+        ax.axhline(y=1, color='k',alpha=0.3,linestyle='--')
+        # Plot a vertical line where the mean is
+        if plotMean:
+            ax.axvline(x=self.mean,color='k',alpha=0.7,
+            linestyle='--',label= 'Mean = {:.3f}'.format(self.mean))
+
+        # Set legend location
+        ax.legend(loc='best')
+
+        plt.title("Distribution of generated values")
+        plt.show()        
+
+
+
+
+
+class InverseTransform(Generator):
     '''
     Inverse transform method to generate
     random continue variables with distribution
@@ -16,25 +126,20 @@ class InverseTransform():
         pdf = [],
         conds = [],
         piecewise = True,
-        x_lim = (0,8)
+        x_lim = (0,8),
+        y_lim = (0,2),
+        linspace = []
         ):
         # This is the one we actually use to generate the 
         # variable
+        super().__init__(pdf,cdf,conds,piecewise,x_lim,y_lim,linspace)
         self.inverse_cdf = inverse_cdf
-        # The cummulative distribution function
-        self.cdf = cdf
-        # The density probability function, used to plot
-        self.pdf = pdf
-        self.piecewise = piecewise
         if piecewise:
             self.limits = self._calculateLimits(limits)
         else:
             self.limits = [1]
-        self.conds = conds
-        self.values = []
-        self.mean = 0
-        self.x_lim = x_lim
-    
+
+
     def _calculateLimits(self,limits):
         lims = []
         for i in range(len(limits)):
@@ -55,54 +160,6 @@ class InverseTransform():
             lim = lims[i]
         return fun(u)    
 
-    def plot(
-        self,
-        nValues,
-        y_lim=(0,2),
-        figsize=(12,6),
-        bins = 20):
-        '''
-        To plot, the probability density function must 
-        be defined. Also a list of 
-        conditions should be given
-        '''
-        # pylint: disable=no-member,unused-variable
-        x_lim = self.x_lim
-        ffunc = self.pdf
-        x = np.linspace(x_lim[0],x_lim[1])
-        # Create new Figure and an Axes which fills it.
-        fig,ax = plt.subplots(figsize=figsize)
-        if self.piecewise:
-            conds = self.conds
-            f = np.piecewise(x, conds, ffunc)
-            ax.plot(x,f,'k',linewidth=3,label='f(x)')
-        else:
-            f = ffunc[0]
-            ax.plot(x,f(x),'k',linewidth=3,label='f(x)')
-        
-    
-        values = [self.gen() for _ in range(nValues)]
-        
-        self.values = values
-        self.mean = np.mean(values)
-    
-        N,bins,patches = ax.hist(values,bins=bins,density=True,color='k')
-        fracs = N / N.max()
-
-        norm = colors.Normalize(fracs.min(), fracs.max())
-        norm = colors.Normalize(fracs.min(), fracs.max())
-
-        for thisfrac, thispatch in zip(fracs, patches):
-            color = plt.cm.Spectral_r(norm(thisfrac))
-            thispatch.set_facecolor(color)
-
-        ax.set_xlim(x_lim[0],x_lim[1])
-        ax.legend(loc='upper left')
-        ax.set_xticks( range(x_lim[0],x_lim[1]) )
-        ax.spines['left'].set_position('zero')
-        ax.spines['bottom'].set_position('zero')
-        plt.title("Distribution of generated values")
-        plt.show()        
 
 
 

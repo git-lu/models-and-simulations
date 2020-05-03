@@ -53,11 +53,13 @@ def plot(funcs,
     ax.set_xlim(x_lim[0],x_lim[1])
     ax.set_ylim(y_lim[0],y_lim[1])
     # Plot horizontal line at 1
-    ax.axhline(y=1, color='k',alpha=0.7,linestyle='--')
-    ax.axvline(x=0,color='k',alpha=0.7)
+    ax.axhline(y=1, color='k',alpha=0.3,linestyle='--')
+    # Plot cartesian ax
+    ax.axvline(x=0,color='k')
+    ax.axhline(y=0,color='k')
     # Acommodate the x and y axis to be set on zero
     #ax.spines['left'].set_position('zero')
-    ax.spines['bottom'].set_position('zero')
+    #ax.spines['bottom'].set_position('zero')
     ax.legend(loc='best')
 
     # show the plot

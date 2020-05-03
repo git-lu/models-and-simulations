@@ -1,4 +1,4 @@
-from discreteVariablesMethods.randomIntGenerators import VonNeumann
+from dvm.rintgen import VonNeumann
 
 def test_Sequence():
     expectedValues = [

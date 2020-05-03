@@ -1,5 +1,5 @@
-from discreteVariablesMethods.randomIntGenerators import CongruentialGenerator
-from discreteVariablesMethods.randomIntGenerators import MixedCongruentialGenerator
+from dvm.rintgen import CongruentialGenerator
+from dvm.rintgen import MixedCongruentialGenerator
 
 def test_congruentialGenerator():
     assert True
