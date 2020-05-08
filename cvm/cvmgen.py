@@ -306,3 +306,35 @@ class CompositionMethod(Generator):
         return gen()
 
         
+
+class RejectionMethod(Generator):
+    '''
+    Generate a random variable with distribution
+    pdf_x, given another random variable y,
+    which we know how to generate.
+    '''
+
+    def __init__(self,pdf_x,pdf_y,gen_y,c=None,**kw):
+        self.pdf_x = pdf_x
+        self.pdf_y = pdf_y
+        self.gen_y = gen_y
+        if c is None:
+            self.c = self.__calculateC()
+        else:
+            self.c = c
+        super().__init__(pdf=pdf_x,**kw)
+
+    def __calculateC(self):
+        '''
+        C is the minimum value
+        such that f(x)/g(x) < c
+        
+        '''
+        
+        return 0
+
+    def gen(self):
+        y = self.gen_y()
+        while random() >= self.pdf_x[0](y) / (self.c * self.pdf_y(y)):
+            y = self.gen_y()
+        return y 
