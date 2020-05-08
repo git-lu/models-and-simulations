@@ -19,7 +19,8 @@ class Generator():
         piecewise = True,
         x_lim = (0,8),
         y_lim = (0,1),
-        linspace = []
+        linspace = [],
+        generator = None
         ):
         # The density probability function, used to plot
         self.pdf = pdf
@@ -35,6 +36,11 @@ class Generator():
         self.mean = 0
         # Linear space in which we generate the variable and plot
         self.linspace = linspace
+        # You can define a custom generator
+        self.generator = generator
+
+    def gen(self):
+        return self.generator()
 
     def plot(
         self,
@@ -90,7 +96,7 @@ class Generator():
         # Set x_axis limits 
         ax.set_xlim(x_lim[0],x_lim[1])
         # Set y_axis limits
-        ax.set_xlim(x_lim[0],x_lim[1])
+        ax.set_ylim(y_lim[0],y_lim[1])
         # Set x_ticks 
         ax.set_xticks(range(x_lim[0],x_lim[1]))
         # We draw a cartesian ax
@@ -117,7 +123,8 @@ class InverseTransform(Generator):
     '''
     Inverse transform method to generate
     random continue variables with distribution
-    f given the cummulative probability function.
+    f given the inverse of the 
+    cummulative probability function.
     '''
     def __init__(
         self,
@@ -166,11 +173,12 @@ class Exponential(InverseTransform):
     def __init__(self,lamda,x_lim=(0,8)):
         self.lamda = lamda
         pdf = [0,lambda x: lamda*np.exp(-lamda*x)]
+        cdf = [0,lambda x: 1 - np.exp(-lamda*x)]
         # We will use our own generation method so...
         inverse_cdf = []
         x = np.linspace(x_lim[0],x_lim[1])
         conds = [x<0,x>=0]
-        super().__init__(inverse_cdf,pdf=pdf,conds=conds,x_lim=x_lim,)
+        super().__init__(inverse_cdf,pdf=pdf,cdf=cdf,conds=conds,x_lim=x_lim,)
 
     def gen(self):
         lamda = self.lamda
