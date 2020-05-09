@@ -129,20 +129,14 @@ class InverseTransform(Generator):
     def __init__(
         self,
         inverse_cdf,
-        cdf=[],
         limits=[],
-        pdf = [],
-        conds = [],
-        piecewise = True,
-        x_lim = (0,8),
-        y_lim = (0,2),
-        linspace = []
+        **kw
         ):
         # This is the one we actually use to generate the 
         # variable
-        super().__init__(pdf,cdf,conds,piecewise,x_lim,y_lim,linspace)
+        super().__init__(**kw)
         self.inverse_cdf = inverse_cdf
-        if piecewise:
+        if self.piecewise:
             self.limits = self._calculateLimits(limits)
         else:
             self.limits = [1]
