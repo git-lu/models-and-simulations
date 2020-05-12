@@ -33,7 +33,7 @@ class Generator():
         self.y_lim = y_lim
         self.conds = conds
         self.values = []
-        self.mean = 0
+        self.vmean = 0
         # Linear space in which we generate the variable and plot
         self.linspace = linspace
         # You can define a custom generator
@@ -47,7 +47,8 @@ class Generator():
         nValues,
         figsize=(12,6),
         bins = 20,
-        plotMean = True):
+        plotMean = True,
+        ):
         '''
         To plot, the probability density function must 
         be defined. Also a list of 
@@ -79,7 +80,7 @@ class Generator():
         values = [self.gen() for _ in range(nValues)]
         
         self.values = values
-        self.mean = np.mean(values)
+        self.vmean = np.mean(values)
 
         # Here we plot the histogram and color the bars
         # per height
@@ -106,8 +107,8 @@ class Generator():
         ax.axhline(y=1, color='k',alpha=0.3,linestyle='--')
         # Plot a vertical line where the mean is
         if plotMean:
-            ax.axvline(x=self.mean,color='k',alpha=0.7,
-            linestyle='--',label= 'Mean = {:.3f}'.format(self.mean))
+            ax.axvline(x=self.vmean,color='k',alpha=0.7,
+            linestyle='--',label= 'Mean = {:.3f}'.format(self.vmean))
 
         # Set legend location
         ax.legend(loc='best')
@@ -308,10 +309,12 @@ class RejectionMethod(Generator):
     which we know how to generate.
     '''
 
-    def __init__(self,pdf_x,pdf_y,gen_y,c=None,**kw):
+    def __init__(self,pdf_x,pdf_y,gen_y,c,limits,**kw):
         self.pdf_x = pdf_x
         self.pdf_y = pdf_y
         self.gen_y = gen_y
+        # The upper bounds of the piecewise definition of the function
+        self.limits = limits
         if c is None:
             self.c = self.__calculateC()
         else:
@@ -329,6 +332,18 @@ class RejectionMethod(Generator):
 
     def gen(self):
         y = self.gen_y()
-        while random() >= self.pdf_x[0](y) / (self.c * self.pdf_y(y)):
+        while random() >= self.evaluate(y) / (self.c * self.pdf_y(y)):
             y = self.gen_y()
         return y 
+
+    def evaluate(self,y):
+        if (len(self.pdf_x) != len(self.limits)):
+            raise ValueError("Give as many functions as limits")
+        i = 0
+        while y > self.limits[i]:
+            i+=1
+        if not callable(self.pdf_x[i]):
+            res = self.pdf_x[i]
+        else:
+            res = self.pdf_x[i](y)
+        return res
