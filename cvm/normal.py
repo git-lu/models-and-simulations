@@ -87,7 +87,9 @@ class NormalPolar(Normal):
         super().__init__(mean,stdev,method='p',**kw)
 
     def gen(self):
+        # Generate an exponential(1) for R
         SquareR = -2 * np.log(1-random())
+        # Generate a random uniform (0,2pi) for theta
         Thetha = 2 * math.pi * random()
         x = np.sqrt(SquareR) * np.cos(Thetha)
         y = np.sqrt(SquareR) * np.sin(Thetha)

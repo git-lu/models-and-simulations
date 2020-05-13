@@ -76,8 +76,13 @@ class Generator():
             f = ffunc[0]
             ax.plot(x,f(x),'k',linewidth=3,label='f(x)')
         
-        # Generate n_values to plot
-        values = [self.gen() for _ in range(nValues)]
+        # Generate n_values to plot and not plot the "problematic" ones
+        values = []
+        for _ in range(nValues):
+            value = self.gen() 
+            if abs(value) < abs(x_lim[1]-x_lim[0])*3:
+                values.append(value)
+        # values = [self.gen() for _ in range(nValues)]
         
         self.values = values
         self.vmean = np.mean(values)
@@ -347,3 +352,4 @@ class RejectionMethod(Generator):
         else:
             res = self.pdf_x[i](y)
         return res
+    
