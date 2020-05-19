@@ -6,20 +6,37 @@ import numpy as np
 class Cauchy(Generator):
     '''
     Generate a cauchy variable
-    with different methods
+    with different methods.
+    Possible methods:
+    q: uniform quotient method
+    it: inverse transform method
     '''
     def __init__(self,lamda=1,method='q',**kw):
+        METHODS = ['q','it']
+        if method not in METHODS:
+            raise ValueError('Possible values for method are {}'.format(METHODS))
         CAUCHYCONST = lamda*math.pi 
+        PDFCONST = 1/math.pi
+        PI = math.pi
         self.lamda = lamda
         self.method = method
+        self.cdf = [lambda x: 1/2 + np.arctan(x/self.lamda)*PDFCONST]
         self.pdf = [lambda x: 1/(CAUCHYCONST*(1+(x/lamda)**2))]
-        super().__init__(pdf=self.pdf,piecewise=False,**kw)
+        self.inverse_cdf = lambda x: self.lamda*np.tan(PI*(x-1/2))
+        super().__init__(pdf=self.pdf,cdf=self.cdf,piecewise=False,**kw)
 
     def gen(self):
-        return self.genQ()
+        method = self.method
+        if method == 'q':
+            value = self.genQ()
+        elif method == 'it':
+            value = self.genIT()
+        return value
 
     def genIT(self):
-        return 0
+        inverse_cdf = self.inverse_cdf
+        u = random()
+        return inverse_cdf(u)*self.lamda    
 
     def genQ(self):
         '''

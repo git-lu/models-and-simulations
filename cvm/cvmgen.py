@@ -121,7 +121,32 @@ class Generator():
         plt.title("Distribution of generated values")
         plt.show()        
 
+    def _PFromValues(self,a,values):
+        n = len(values)
+        count = 0
+        for v in values:
+            if v < a:
+                count +=1
+        return count/n
 
+         
+    
+    def P(self,a,nSim):
+        estimatedP = 0
+        calc_values = len(self.values)
+        gen_values = self.values
+        # If we generated more values than the
+        # ones we intend to estimate with,
+        # we slice the array 
+        if calc_values >= nSim:
+            estimatedP = self._PFromValues(a,gen_values[:nSim])
+        # Otherwise, we should generate the 
+        # missing values
+        else: 
+            for _ in range(nSim - calc_values):
+                self.values = gen_values.append(self.gen())
+            estimatedP = self._PFromValues(a,self.values)
+        return estimatedP
 
 
 
