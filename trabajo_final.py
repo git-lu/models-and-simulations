@@ -25,7 +25,7 @@ class Banco():
         # Cantidad de clientes actualmente en el banco
         self.clientes_actuales = 0
         # Clientes en cada fila
-        self.filas = [deque()]*n_filas
+        self.filas = [deque() for _ in range(self.n_filas)]
         # Cantidad de clientes atendidos en cada caja
         self.atenciones_cajas = [0]*n_cajas
         # Cantidad de arribos de clientes
@@ -87,7 +87,7 @@ class Banco():
         # Cantidad de clientes actualmente en el banco
         self.clientes_actuales = 0
         # Clientes en cada fila
-        self.filas = [deque()]*self.n_filas
+        self.filas = [deque() for _ in range(self.n_filas)]
         # Cantidad de clientes atendidos en cada caja
         self.atenciones_cajas = [0]*self.n_cajas
         # Cantidad de arribos y salidas del banco
@@ -175,7 +175,7 @@ class Banco():
         n_cliente = self.n_arribos
         # Si todas las cajas están ocupadas
         # encolamos al cliente
-        if self.clientes_actuales >= self.n_cajas:
+        if min(self.cajas_clientes) != 0:
             self.encolar_cliente()
         # Sino, hay alguna caja en donde podemos atender
         # al nuevo cliente.
@@ -207,7 +207,6 @@ class Banco():
         fila_mas_corta = np.argmin(largos_filas)
         # Agregamos al cliente al final de la fila más corta
         self.filas[fila_mas_corta].append(n_cliente)
-        
         return self
 
     def simulacion(self,N_ARRIBOS,SEED=123):
@@ -223,7 +222,6 @@ class Banco():
         while sum(self.atenciones_cajas) < N_ARRIBOS:
             # Avanzamos en la simulación según cual
             # evento ocurre primero:
-
             # Si el proximo cliente llega antes que se
             # libere alguna caja
             if self.llegada_prox_cliente <= min(self.liberacion_cajas):
